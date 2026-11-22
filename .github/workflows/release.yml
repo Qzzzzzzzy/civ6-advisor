@@ -37,7 +37,7 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.event.release.tag_name || github.ref_name }}"
-          git archive --format=zip --prefix=civ6-advisor/ -o "civ6-advisor-$tag-源码.zip" HEAD
+          git archive --format=zip --prefix=civ6-advisor/ -o "civ6-advisor-$tag-source.zip" HEAD
           Copy-Item dist/Civ6Advisor.exe "Civ6Advisor-$tag.exe"
 
       - name: 附加到 Release
@@ -47,7 +47,7 @@ jobs:
           tag_name: ${{ github.event.release.tag_name }}
           files: |
             Civ6Advisor-${{ github.event.release.tag_name }}.exe
-            civ6-advisor-${{ github.event.release.tag_name }}-源码.zip
+            civ6-advisor-${{ github.event.release.tag_name }}-source.zip
 
       - name: 手动运行时只保存为构建产物
         if: github.event_name != 'release'
@@ -56,4 +56,4 @@ jobs:
           name: civ6-advisor-build
           path: |
             Civ6Advisor-*.exe
-            civ6-advisor-*-源码.zip
+            civ6-advisor-*-source.zip

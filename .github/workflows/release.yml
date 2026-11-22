@@ -1,9 +1,10 @@
 name: Release
 
-# 推送 v* 标签时：在 Windows 上打包 exe，连同源码包一起发布到 GitHub Release
+# 在 GitHub 上发布一个 Release（Releases → Draft a new release → Publish）后：
+# 在 Windows 上打包 exe，连同源码包一起附加到这个 Release
 on:
-  push:
-    tags: ["v*"]
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -35,16 +36,24 @@ jobs:
       - name: 打包源码（含一键启动脚本）
         shell: pwsh
         run: |
-          $tag = "${{ github.ref_name }}"
+          $tag = "${{ github.event.release.tag_name || github.ref_name }}"
           git archive --format=zip --prefix=civ6-advisor/ -o "civ6-advisor-$tag-源码.zip" HEAD
           Copy-Item dist/Civ6Advisor.exe "Civ6Advisor-$tag.exe"
 
-      - name: 发布 Release
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: 附加到 Release
+        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          name: 文明6军师 ${{ github.ref_name }}
-          body_path: docs/release-notes/${{ github.ref_name }}.md
+          tag_name: ${{ github.event.release.tag_name }}
           files: |
-            Civ6Advisor-${{ github.ref_name }}.exe
-            civ6-advisor-${{ github.ref_name }}-源码.zip
+            Civ6Advisor-${{ github.event.release.tag_name }}.exe
+            civ6-advisor-${{ github.event.release.tag_name }}-源码.zip
+
+      - name: 手动运行时只保存为构建产物
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: civ6-advisor-build
+          path: |
+            Civ6Advisor-*.exe
+            civ6-advisor-*-源码.zip

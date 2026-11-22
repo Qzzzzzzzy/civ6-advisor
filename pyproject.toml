@@ -1,0 +1,35 @@
+[project]
+name = "civ6-advisor"
+version = "0.1.0"
+description = "文明6 实时军师：只读取游戏数据，分析局势并推荐下一步（MCP Server）"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=1.20,<2",  # civ6-mcp 也基于 v1 的 FastMCP
+    # 复用 civ6-mcp 的 FireTuner 连接层和 Lua 查询（MIT 协议）
+    "civ6-mcp @ https://github.com/lmwilki/civ6-mcp/archive/dd2019056371b92ea4854e879ddf05a8cad95e8a.zip",  # 固定版本，安装不需要 git
+]
+
+[project.optional-dependencies]
+overlay = ["PySide6-Essentials>=6.7"]
+
+[project.scripts]
+civ6-advisor = "civ6_advisor.server:main"
+
+[project.gui-scripts]
+civ6-overlay = "civ6_advisor.overlay:main"
+civ6-launcher = "civ6_advisor.launcher:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/civ6_advisor"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
